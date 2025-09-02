@@ -1,26 +1,26 @@
 # Pixel Art Studio 🎨
 
-Um editor de pixel art moderno com múltiplas funcionalidades, desenvolvido com HTML5, CSS3 e JavaScript puro.
+A modern pixel art editor with multiple features, developed with HTML5, CSS3, and pure JavaScript.
 
-## ⚡ | Acessa já e comece a pintar clicando [Aqui](https://pixel-art-studio.vercel.app/)
+## ⚡ | Access it now and start painting by clicking [Here](https://pixel-art-studio.vercel.app/)
 
-## ✨ Funcionalidades
+## ✨ Features
 
-- **Múltiplas Paletas de Cores**
-  - Básica, Pastel e Neon
-  - 8 cores por paleta
-- **Quadro Dinâmico**
-  - Tamanho personalizável (5x5 até 50x50)
-  - Grid responsivo
-- **Gestão de Projetos**
-  - Salvar/Carregar no localStorage
-  - Exportar para PNG
-- **Ferramentas**
-  - Limpeza total do quadro
-  - Seleção de cores intuitiva
-  - Feedback visual de interações
+- **Multiple Color Palettes**
+  - Basic, Pastel, and Neon
+  - 8 colors per palette
+- **Dynamic Canvas**
+  - Customizable size (5x5 to 50x50)
+  - Responsive grid
+- **Project Management**
+  - Save/Load in localStorage
+  - Export to PNG
+- **Tools**
+  - Total canvas cleanup
+  - Intuitive color selection
+  - Visual feedback on interactions
 
-### Desenvolvido por: [RobotEby - Kerlon Amaral]
+### Developed by: [RobotEby - Kerlon Amaral]
 
-#### Última Atualização: 16/07/2024
-#### Nova Atualização: 28/04/2025
+#### Last Update: 07/16/2024
+#### New Update: 04/28/2025
