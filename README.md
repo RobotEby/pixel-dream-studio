@@ -2,7 +2,7 @@
 
 A modern pixel art editor with multiple features, developed with HTML5, CSS3, and pure JavaScript.
 
-## ⚡ | Access it now and start painting by clicking [Here](https://pixel-art-studio.vercel.app/)
+## ⚡ | Access it now and start painting by clicking [Here](https://interactive-color-palette.vercel.app/)
 
 ## ✨ Features
 
