@@ -1,20 +1,16 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Download } from 'lucide-react';
 
 interface ExportDialogProps {
   pixels: string[];
   boardSize: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ExportDialog({ pixels, boardSize }: ExportDialogProps) {
+export function ExportDialog({ pixels, boardSize, open, onOpenChange }: ExportDialogProps) {
   const [scale, setScale] = useState(2);
 
   const handleExport = useCallback(() => {
@@ -36,12 +32,7 @@ export function ExportDialog({ pixels, boardSize }: ExportDialogProps) {
   }, [pixels, boardSize, scale]);
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Download className="h-3 w-3 mr-1" /> Exportar
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xs">
         <DialogHeader>
           <DialogTitle>Exportar PNG</DialogTitle>

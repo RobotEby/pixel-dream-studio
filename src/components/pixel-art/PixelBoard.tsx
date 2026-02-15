@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 
 interface PixelBoardProps {
   pixels: string[];
@@ -22,71 +22,108 @@ export function PixelBoard({
   onPaintEnd,
 }: PixelBoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
-  const pixelSize = Math.max(12, Math.min(32, Math.floor(500 / boardSize)));
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastIndexRef = useRef<number>(-1);
+  const [pixelSize, setPixelSize] = useState(16);
 
-  const handleMouseDown = useCallback(
-    (index: number) => {
-      onPaintStart();
-      onPaintPixel(index);
+  useEffect(() => {
+    const calculate = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const available = Math.min(rect.width - 16, rect.height - 16);
+      const size = Math.floor(available / boardSize);
+      setPixelSize(Math.max(4, Math.min(24, size)));
+    };
+    calculate();
+    const observer = new ResizeObserver(calculate);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [boardSize]);
+
+  const getIndexFromPoint = useCallback(
+    (x: number, y: number): number | null => {
+      if (!boardRef.current) return null;
+      const rect = boardRef.current.getBoundingClientRect();
+      const col = Math.floor((x - rect.left) / pixelSize);
+      const row = Math.floor((y - rect.top) / pixelSize);
+      if (col < 0 || col >= boardSize || row < 0 || row >= boardSize) return null;
+      return row * boardSize + col;
     },
-    [onPaintStart, onPaintPixel]
+    [boardSize, pixelSize]
   );
 
-  const handleMouseEnter = useCallback(
-    (index: number) => {
-      if (isPainting) onPaintPixel(index);
-    },
-    [isPainting, onPaintPixel]
-  );
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
       e.preventDefault();
-      const touch = e.touches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
-      if (el?.dataset?.index) {
-        onPaintPixel(Number(el.dataset.index));
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      onPaintStart();
+      const index = getIndexFromPoint(e.clientX, e.clientY);
+      if (index !== null) {
+        lastIndexRef.current = index;
+        onPaintPixel(index);
       }
     },
-    [onPaintPixel]
+    [onPaintStart, onPaintPixel, getIndexFromPoint]
   );
 
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isPainting) return;
+      const index = getIndexFromPoint(e.clientX, e.clientY);
+      if (index !== null && index !== lastIndexRef.current) {
+        lastIndexRef.current = index;
+        onPaintPixel(index);
+      }
+    },
+    [isPainting, onPaintPixel, getIndexFromPoint]
+  );
+
+  const handlePointerUp = useCallback(() => {
+    lastIndexRef.current = -1;
+    onPaintEnd();
+  }, [onPaintEnd]);
+
+  const totalSize = pixelSize * boardSize;
+
   return (
-    <div className="relative inline-block rounded-lg bg-card p-2 shadow-sm border border-border">
-      {templateImage && (
-        <img
-          src={templateImage}
-          alt="Template"
-          className="absolute inset-2 opacity-20 pointer-events-none object-cover rounded"
-          style={{ width: `${pixelSize * boardSize}px`, height: `${pixelSize * boardSize}px` }}
-        />
-      )}
-      <div
-        ref={boardRef}
-        id="pixel-board"
-        className="grid relative z-10"
-        style={{ gridTemplateColumns: `repeat(${boardSize}, ${pixelSize}px)` }}
-        onMouseUp={onPaintEnd}
-        onMouseLeave={onPaintEnd}
-        onTouchEnd={onPaintEnd}
-        onTouchMove={handleTouchMove}
-      >
-        {pixels.map((color, i) => (
-          <div
-            key={i}
-            data-index={i}
-            className="transition-colors duration-75"
-            style={{
-              width: pixelSize,
-              height: pixelSize,
-              backgroundColor: color,
-              border: showGrid ? '1px solid hsl(var(--border))' : 'none',
-            }}
-            onMouseDown={() => handleMouseDown(i)}
-            onMouseEnter={() => handleMouseEnter(i)}
-            onTouchStart={() => handleMouseDown(i)}
+    <div ref={containerRef} className="w-full h-full flex items-center justify-center">
+      <div className="relative inline-block rounded-lg bg-card shadow-sm border border-border">
+        {templateImage && (
+          <img
+            src={templateImage}
+            alt="Template"
+            className="absolute inset-0 opacity-20 pointer-events-none object-cover rounded"
+            style={{ width: totalSize, height: totalSize }}
           />
-        ))}
+        )}
+        <div
+          ref={boardRef}
+          id="pixel-board"
+          className="relative z-10 touch-none"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${boardSize}, ${pixelSize}px)`,
+            gridTemplateRows: `repeat(${boardSize}, ${pixelSize}px)`,
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          {pixels.map((color, i) => (
+            <div
+              key={i}
+              style={{
+                width: pixelSize,
+                height: pixelSize,
+                backgroundColor: color,
+                boxSizing: 'border-box',
+                border: showGrid ? '0.5px solid hsl(var(--border) / 0.5)' : 'none',
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
