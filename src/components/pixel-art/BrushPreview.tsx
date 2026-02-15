@@ -21,10 +21,14 @@ interface BrushPreviewProps {
 export function BrushPreview({ color, tool }: BrushPreviewProps) {
   const Icon = toolIcons[tool];
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
-      <div className="h-6 w-6 rounded border border-border" style={{ backgroundColor: color }} />
-      <Icon className="h-4 w-4 text-muted-foreground" />
-      <span className="text-xs text-muted-foreground">{toolLabels[tool]}</span>
+    <div className="flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1">
+      <div
+        className="h-5 w-5 rounded-sm border border-border"
+        style={{ backgroundColor: color }}
+        aria-label={`Cor ativa: ${color}`}
+      />
+      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+      <span className="text-[10px] text-muted-foreground hidden sm:inline">{toolLabels[tool]}</span>
     </div>
   );
 }
